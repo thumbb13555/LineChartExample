@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<HashMap<String,String>> mData = makeFakeData();
         for (int i=0;i<mData.size();i++){//自定義X軸標籤(一般為時間)
-            customxLable.add("第"+(i+1)+"筆");
+            customxLable.add("資料\n第"+(i+1)+"筆");
         }
 
         /**設定圖表框架↓*/
@@ -58,8 +58,16 @@ public class MainActivity extends AppCompatActivity {
 //        xAxis.setEnabled(false);//去掉X軸數值
         xAxis.setDrawGridLines(false);//將X軸格子消失掉
         xAxis.setValueFormatter(new MyValueFormatter());//設置X軸
-        MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view);//設置點擊標籤
+
+        /**此處第二版新增*/
+        MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view,customxLable,chart);//設置點擊標籤
         chart.setMarker(mv);//設置點擊標籤
+        chart.setExtraBottomOffset(20f);//圖表上移20點，避免擋住Ｘ軸文字
+
+        /**此處第二版新增*/
+        //設置X軸標籤換行
+        chart.setXAxisRenderer(new CustomXLabel(chart.getViewPortHandler(),chart.getXAxis()
+                ,chart.getTransformer(YAxis.AxisDependency.LEFT)));
         /**設定圖表框架↑*/
 
         /**載入資料↓*/

@@ -12,45 +12,49 @@ import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
 
-/**
- * Custom implementation of the MarkerView.
- *
- * @author Philipp Jahoda
- */
+import java.util.ArrayList;
+
+
 @SuppressLint("ViewConstructor")
 public class MyMarkerView extends MarkerView {
 
-    private final TextView tvContent;
+    private TextView tvValue, tvTitle;
+    private ArrayList<String> customxLable;
+    private LineChart chart;
 
-    public MyMarkerView(Context context, int layoutResource) {
+    public MyMarkerView(Context context, int layoutResource, ArrayList<String> customxLable,LineChart chart) {
         super(context, layoutResource);
-
-        tvContent = findViewById(R.id.tvContent);
+        this.customxLable = customxLable;
+        this.chart = chart;
+        tvTitle = findViewById(R.id.textView_Title);
+        tvValue = findViewById(R.id.textView_Value);
     }
 
-    // runs every time the MarkerView is redrawn, can be used to update the
-    // content (user-interface)
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
+        String label = customxLable.get(Math.round(e.getX())).replace("資料\n","");
+        tvTitle.setText(label);
+        int line =  chart.getLineData().getDataSets().size();
 
-        if (e instanceof CandleEntry) {
-
-            CandleEntry ce = (CandleEntry) e;
-
-            tvContent.setText(Utils.formatNumber(ce.getHigh(), 1, true));
-        } else {
-
-            tvContent.setText(Utils.formatNumber(e.getY(), 1, true));
+        StringBuffer value = new StringBuffer();
+        for (int i = 0; i <line ; i++) {
+            ILineDataSet set = chart.getLineData().getDataSets().get(i);
+            String s = set.getLabel()+": "+set.getEntryForIndex(Math.round(e.getX())).getY();
+            if (i<line-1) value.append(s+"\n");
+            else value.append(s);
         }
+        tvValue.setText(value);
 
         super.refreshContent(e, highlight);
     }
 
     @Override
-    public MPPointF getOffset() {
-        return new MPPointF(-(getWidth() / 2), -getHeight());
+    public MPPointF getOffsetForDrawingAtPoint(float posX, float posY) {
+        if (posX < 300) return new MPPointF(-getWidth() / 2f+100f, -getHeight() - 10f);
+        else return new MPPointF(-getWidth() / 2f-100f, -getHeight()-10f);
     }
 }
