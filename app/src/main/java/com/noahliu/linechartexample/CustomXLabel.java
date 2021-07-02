@@ -1,4 +1,4 @@
-package com.jetec.linechartexample;
+package com.noahliu.linechartexample;
 
 import android.graphics.Canvas;
 
